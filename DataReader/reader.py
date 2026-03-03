@@ -7,9 +7,11 @@ logger = get_logger('reader')
 
 class BaseReader:
     def __init__(self,filepath):
-        pass
+        self.filepath = filepath
 
 class CSVReader(BaseReader):
+    def  __init__(self, filepath):
+        super().__init__(filepath)
 
     def reader(self):
         logger.info(f"Reading CSV file: {self.filepath}")
@@ -24,6 +26,9 @@ class CSVReader(BaseReader):
      
 
 class JSONReader(BaseReader):
+    def  __init__(self, filepath):
+        super().__init__(filepath)
+
     def reader(self):
         logger.info(f"Reading JSON file: {self.filepath}")
         try:
@@ -37,6 +42,9 @@ class JSONReader(BaseReader):
 
 
 class TXTReader(BaseReader):
+    def  __init__(self, filepath):
+        super().__init__(filepath)
+        
     def reader(self):
         logger.info(f"Reading TXT file: {self.filepath}")
         try:
@@ -52,10 +60,10 @@ class ReaderFactory:
         _, ext = os.path.splitext(filepath)
         ext = ext.lower()
         if ext == '.csv':
-            return CSVReader()
+            return CSVReader(filepath)
         elif ext == '.json':
-            return JSONReader()
+            return JSONReader(filepath)
         elif ext == '.txt':
-            return TXTReader()
+            return TXTReader(filepath)
         else:
             raise ValueError(f"Unsupported file extension: {ext}")
