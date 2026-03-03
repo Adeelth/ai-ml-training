@@ -6,6 +6,7 @@ import glob
 import os
 import concurrent.futures
 import zipfile
+import multiprocessing
 
 
 
@@ -56,16 +57,22 @@ class Dataset:
         except Exception as e:
             logger.error(f"Failed to process file {filepath}: {e}")
 
+    
     def process_dataset(self):
         logger.info(f"Processing dataset {self.dataset_name}")
-      
+    
         all_files = glob.glob(os.path.join(self.folder_path, "**", "*.*"), recursive=True)
         target_files = [f for f in all_files if f.endswith(('.csv', '.json', '.txt'))]
         logger.info(f"Found {len(target_files)} target files for processing.")
 
         all_processed_data = []
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        
+    
+        num_workers = multiprocessing.cpu_count() 
+
+        with concurrent.futures.ProcessPoolExecutor(max_workers=num_workers) as executor:
             future_to_file = {executor.submit(self.process_file, filepath): filepath for filepath in target_files}
+            
             for future in concurrent.futures.as_completed(future_to_file):
                 filepath = future_to_file[future]
                 try:
